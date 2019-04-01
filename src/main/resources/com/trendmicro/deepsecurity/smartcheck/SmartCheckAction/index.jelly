@@ -1,0 +1,204 @@
+<?jelly escape-by-default="true"?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+  <l:layout
+    title="overview-layout"
+  >
+    <l:header>
+      <style>
+        .smart-check-vulnerability-table {
+          border-spacing: 0;
+          border-collapse: collapse;
+        }
+        .smart-check-vulnerability-table td,th {
+          border: 1px solid #bbb;
+          min-width: 110px;
+          padding: 5px 10px;
+        }
+        .smart-check-vulnerability-table td {
+          text-align: right;
+        }
+        .smart-check-vulnerability-table td:first-child {
+          text-align: left;
+        }
+        .smart-check-vulnerability-table th {
+          font-weight: bold;
+          background-color: #f0f0f0;
+          white-space: nowrap;
+        }
+      </style>
+    </l:header>
+    <st:include it="${it.run}" page="sidepanel.jelly" optional="true" />
+    <l:main-panel>
+      <j:set
+        var="malwareCount"
+        value="${it.getScanResult().getFindings().getMalware()}"
+      />
+      <j:set
+        var="contentFindings"
+        value="${it.getScanResult().getFindings().getContents()}"
+      />
+      <j:set
+        var="vulnerabilities"
+        value="${it.getScanResult().getFindings().getVulnerabilities()}"
+      />
+      <j:set
+        var="checklistFindings"
+        value="${it.getScanResult().getFindings().getChecklists()}"
+      />
+      <h1>
+        Deep Security Smart Check Scan Report
+      </h1>
+      <p>
+        For more details see the
+        <a href="${it.getScanUIUrl()}">
+          full scan results
+        </a>.
+      </p>
+
+      <h2>Malware Summary</h2>
+      <p>
+        Found: ${malwareCount}
+      </p>
+
+      <h2>
+        Content Findings Summary
+      </h2>
+      <table class="smart-check-vulnerability-table">
+        <thead>
+          <tr>
+            <th scope="row">
+              Severity
+            </th>
+            <th scope="column">Defcon1</th>
+            <th scope="column">Critical</th>
+            <th scope="column">High</th>
+            <th scope="column">Medium</th>
+            <th scope="column">Low</th>
+            <th scope="column">Negligible</th>
+            <th scope="column">Unknown</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">
+              Total
+            </th>
+            <td>${contentFindings.getTotal().getDefcon1()}</td>
+            <td>${contentFindings.getTotal().getCritical()}</td>
+            <td>${contentFindings.getTotal().getHigh()}</td>
+            <td>${contentFindings.getTotal().getMedium()}</td>
+            <td>${contentFindings.getTotal().getLow()}</td>
+            <td>${contentFindings.getTotal().getNegligible()}</td>
+            <td>${contentFindings.getTotal().getUnknown()}</td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Unresolved
+            </th>
+            <td>${contentFindings.getUnresolved().getDefcon1()}</td>
+            <td>${contentFindings.getUnresolved().getCritical()}</td>
+            <td>${contentFindings.getUnresolved().getHigh()}</td>
+            <td>${contentFindings.getUnresolved().getMedium()}</td>
+            <td>${contentFindings.getUnresolved().getLow()}</td>
+            <td>${contentFindings.getUnresolved().getNegligible()}</td>
+            <td>${contentFindings.getUnresolved().getUnknown()}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>
+        Vulnerability Summary
+      </h2>
+      <table class="smart-check-vulnerability-table">
+        <thead>
+          <tr>
+            <th scope="row">
+              Severity
+            </th>
+            <th scope="column">Defcon1</th>
+            <th scope="column">Critical</th>
+            <th scope="column">High</th>
+            <th scope="column">Medium</th>
+            <th scope="column">Low</th>
+            <th scope="column">Negligible</th>
+            <th scope="column">Unknown</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">
+              Total
+            </th>
+            <td>${vulnerabilities.getTotal().getDefcon1()}</td>
+            <td>${vulnerabilities.getTotal().getCritical()}</td>
+            <td>${vulnerabilities.getTotal().getHigh()}</td>
+            <td>${vulnerabilities.getTotal().getMedium()}</td>
+            <td>${vulnerabilities.getTotal().getLow()}</td>
+            <td>${vulnerabilities.getTotal().getNegligible()}</td>
+            <td>${vulnerabilities.getTotal().getUnknown()}</td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Unresolved
+            </th>
+            <td>${vulnerabilities.getUnresolved().getDefcon1()}</td>
+            <td>${vulnerabilities.getUnresolved().getCritical()}</td>
+            <td>${vulnerabilities.getUnresolved().getHigh()}</td>
+            <td>${vulnerabilities.getUnresolved().getMedium()}</td>
+            <td>${vulnerabilities.getUnresolved().getLow()}</td>
+            <td>${vulnerabilities.getUnresolved().getNegligible()}</td>
+            <td>${vulnerabilities.getUnresolved().getUnknown()}</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <h2>
+        Checklist Summary
+      </h2>
+      <table class="smart-check-vulnerability-table">
+        <thead>
+          <tr>
+            <th scope="row">
+              Severity
+            </th>
+            <th scope="column">Defcon1</th>
+            <th scope="column">Critical</th>
+            <th scope="column">High</th>
+            <th scope="column">Medium</th>
+            <th scope="column">Low</th>
+            <th scope="column">Negligible</th>
+            <th scope="column">Unknown</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">
+              Total
+            </th>
+            <td>${checklistFindings.getTotal().getDefcon1()}</td>
+            <td>${checklistFindings.getTotal().getCritical()}</td>
+            <td>${checklistFindings.getTotal().getHigh()}</td>
+            <td>${checklistFindings.getTotal().getMedium()}</td>
+            <td>${checklistFindings.getTotal().getLow()}</td>
+            <td>${checklistFindings.getTotal().getNegligible()}</td>
+            <td>${checklistFindings.getTotal().getUnknown()}</td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Unresolved
+            </th>
+            <td>${checklistFindings.getUnresolved().getDefcon1()}</td>
+            <td>${checklistFindings.getUnresolved().getCritical()}</td>
+            <td>${checklistFindings.getUnresolved().getHigh()}</td>
+            <td>${checklistFindings.getUnresolved().getMedium()}</td>
+            <td>${checklistFindings.getUnresolved().getLow()}</td>
+            <td>${checklistFindings.getUnresolved().getNegligible()}</td>
+            <td>${checklistFindings.getUnresolved().getUnknown()}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

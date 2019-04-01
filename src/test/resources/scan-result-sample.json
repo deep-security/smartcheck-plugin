@@ -1,0 +1,164 @@
+{
+  "id": "string",
+  "href": "/api/scans/60e53669-c8ef-4d0f-a8ff-3dbbb098d8ff",
+  "name": "string",
+  "source": {
+    "type": "docker",
+    "registry": "registry.example.com",
+    "repository": "organization/project",
+    "tag": "latest",
+    "digest": "sha256:02892826401a9d18f0ea01f8a2f35d328ef039db4e1edcc45c630314a0457d5b",
+    "insecureSkipVerify": false,
+    "rootCAs": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi4uLiBhbmQgc28gb24gLi4uCg=="
+  },
+  "status": "pending",
+  "details": {
+    "detail": "More details about the scan status",
+    "requested": "2018-05-01T00:00:00Z",
+    "started": "2018-05-01T00:00:00Z",
+    "updated": "2018-05-01T00:00:00Z",
+    "completed": "2018-05-01T00:00:00Z",
+    "digest": "sha256:43ea500473edb96e079fe23aba62d60e09c11d4c4714ca284d50b80e064c05e3",
+    "os": "linux",
+    "architecture": "amd64",
+    "labels": {
+      "key": "value"
+    },
+    "results": [
+      {
+        "id": "sha256:77beb64c6eca68574566d5b04b9f64c71d9b7757a446d562b7d0ae4b13b7c467",
+        "createdAt": "2018-05-01T00:00:00Z",
+        "createdBy": "/bin/sh -c #(nop) ADD file:5d127078b2f213dbbf08ca35dafd027011606887a655f641024b14d93ee0de2f in /run-httpd.sh",
+        "malware": "string",
+        "vulnerabilities": "string",
+        "contents": "string",
+        "findings": {
+          "scanners": {
+            "malware": {
+              "status": "ok",
+              "updated": "2018-05-01T00:00:00Z",
+              "versions": {
+                "icrc": "string",
+                "trendX": "string",
+                "blacklist": "string"
+              }
+            },
+            "vulnerabilities": {
+              "status": "ok",
+              "updated": "2018-05-01T00:00:00Z"
+            },
+            "vulnerabilityPatterns": {
+              "status": "ok",
+              "date": "2018-05-01T00:00:00Z",
+              "updated": "2018-05-01T00:00:00Z"
+            }
+          },
+          "malware": 0,
+          "contents": {
+            "total": {
+              "defcon1": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0,
+              "negligible": 0,
+              "unknown": 0
+            },
+            "unresolved": {
+              "defcon1": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0,
+              "negligible": 0,
+              "unknown": 0
+            }
+          },
+          "vulnerabilities": {
+            "total": {
+              "defcon1": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0,
+              "negligible": 0,
+              "unknown": 0
+            },
+            "unresolved": {
+              "defcon1": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0,
+              "negligible": 0,
+              "unknown": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "findings": {
+    "scanners": {
+      "malware": {
+        "status": "ok",
+        "updated": "2018-05-01T00:00:00Z",
+        "versions": {
+          "icrc": "string",
+          "trendX": "string",
+          "blacklist": "string"
+        }
+      },
+      "vulnerabilities": {
+        "status": "ok",
+        "updated": "2018-05-01T00:00:00Z"
+      },
+      "vulnerabilityPatterns": {
+        "status": "ok",
+        "date": "2018-05-01T00:00:00Z",
+        "updated": "2018-05-01T00:00:00Z"
+      }
+    },
+    "malware": 0,
+    "contents": {
+      "total": {
+        "defcon1": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "negligible": 0,
+        "unknown": 0
+      },
+      "unresolved": {
+        "defcon1": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "negligible": 0,
+        "unknown": 0
+      }
+    },
+    "vulnerabilities": {
+      "total": {
+        "defcon1": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "negligible": 0,
+        "unknown": 0
+      },
+      "unresolved": {
+        "defcon1": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "negligible": 0,
+        "unknown": 0
+      }
+    }
+  }
+}
