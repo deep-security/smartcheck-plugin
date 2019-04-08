@@ -105,27 +105,30 @@ withCredentials([
   - A JSON object that can be used to fail this step if an image contains
     findings that exceed the threshold.
 
-    Default value:
+    Example with default values:
 
-    ```json
-    {
-      "malware": 0,
-      "vulnerabilities": {
-        "defcon1": 0,
-        "critical": 0,
-        "high": 0
-      },
-      "contents": {
-        "defcon1": 0,
-        "critical": 0,
-        "high": 0
-      },
-      "checklists": {
-        "defcon1": 0,
-        "critical": 0,
-        "high": 0
-      }
-    }
+    ```groovy
+    smartcheckScan([
+        //...
+        findingsThreshold: new groovy.json.JsonBuilder([
+            malware: 0,
+            vulnerabilities: [
+                defcon1: 0,
+                critical: 0,
+                high: 0,
+            ],
+            contents: [
+                defcon1: 0,
+                critical: 0,
+                high: 0,
+            ],
+            checklists: [
+                defcon1: 0,
+                critical: 0,
+                high: 0,
+            ],
+        ]).toString(),
+    ])
     ```
 
     Schema:
