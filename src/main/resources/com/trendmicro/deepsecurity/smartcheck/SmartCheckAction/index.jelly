@@ -50,9 +50,7 @@
       </h1>
       <p>
         For more details see the
-        <a href="${it.getScanUIUrl()}">
-          full scan results
-        </a>.
+        <a href="${it.getScanUIUrl()}">full scan results</a>.
       </p>
 
       <h2>Malware Summary</h2>
