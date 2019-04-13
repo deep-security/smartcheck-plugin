@@ -21,29 +21,20 @@ In your pipeline script:
 ```groovy
 withCredentials([
     usernamePassword([
-        credentialsId: "smartcheck-auth",
-        usernameVariable: "DSSC_USER",
-        passwordVariable: "DSSC_PASSWORD",
+        credentialsId: "example-registry-auth",
+        usernameVariable: "REGISTRY_USER",
+        passwordVariable: "REGISTRY_PASSWORD",
     ])
 ]){
-    withCredentials([
-        usernamePassword([
-            credentialsId: "example-registry-auth",
-            usernameVariable: "REGISTRY_USER",
-            passwordVariable: "REGISTRY_PASSWORD",
-        ])
-    ]){
-        smartcheckScan([
-            imageName: "registry.example.com/my-project/my-image",
-            smartcheckHost: "smartcheck.example.com",
-            smartcheckUser: DSSC_USER,
-            smartcheckPassword: DSSC_PASSWORD,
-            imagePullAuth: new groovy.json.JsonBuilder([
-                username: REGISTRY_USER,
-                password: REGISTRY_PASSWORD,
-            ]).toString(),
-        ])
-    }
+    smartcheckScan([
+        imageName: "registry.example.com/my-project/my-image",
+        smartcheckHost: "smartcheck.example.com",
+        smartcheckCredentialsId: "smartcheck-auth",
+        imagePullAuth: new groovy.json.JsonBuilder([
+            username: REGISTRY_USER,
+            password: REGISTRY_PASSWORD,
+        ]).toString(),
+    ])
 }
 ```
 
@@ -56,10 +47,9 @@ withCredentials([
   - If the client should ignore certificate errors when connecting to Deep
     Security Smart Check. You may want to set this if you've configured a self
     signed cert.
-- **smartcheckUser**
-  - The username to authenticate with the Deep Security Smart Check deployment
-- **smartcheckPassword**
-  - The password to authenticate with the Deep Security Smart Check deployment
+- **smartcheckCredentialsId**
+  - The credentials to authenticate with the Deep Security Smart Check deployment.
+    This must be a "Username with password" credential.
 - **imageName**
   - The name of the image to scan
 - **imagePullAuth**
@@ -177,28 +167,19 @@ method:
 ```groovy
 withCredentials([
     usernamePassword([
-        credentialsId: "smartcheck-auth",
-        usernameVariable: "DSSC_USER",
-        passwordVariable: "DSSC_PASSWORD",
+        credentialsId: "preregistry-auth",
+        usernameVariable: "PREREGISTRY_USER",
+        passwordVariable: "PREREGISTRY_PASSWORD",
     ])
 ]){
-    withCredentials([
-        usernamePassword([
-            credentialsId: "preregistry-auth",
-            usernameVariable: "PREREGISTRY_USER",
-            passwordVariable: "PREREGISTRY_PASSWORD",
-        ])
-    ]){
-        smartcheckScan([
-            imageName: "registry.example.com/my-project/my-image",
-            smartcheckHost: "smartcheck.example.com",
-            smartcheckUser: DSSC_USER,
-            smartcheckPassword: DSSC_PASSWORD,
-            preregistryScan: true,
-            preregistryUser: PREREGISTRY_USER,
-            preregistryPassword: PREREGISTRY_PASSWORD,
-        ])
-    }
+    smartcheckScan([
+        imageName: "registry.example.com/my-project/my-image",
+        smartcheckHost: "smartcheck.example.com",
+        smartcheckCredentialsId: "smartcheck-auth",
+        preregistryScan: true,
+        preregistryUser: PREREGISTRY_USER,
+        preregistryPassword: PREREGISTRY_PASSWORD,
+    ])
 }
 ```
 

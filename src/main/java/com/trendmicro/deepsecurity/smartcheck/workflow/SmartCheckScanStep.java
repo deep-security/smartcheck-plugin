@@ -3,6 +3,8 @@ package com.trendmicro.deepsecurity.smartcheck.workflow;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -22,6 +24,10 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.trendmicro.deepsecurity.smartcheck.Messages;
 import com.trendmicro.deepsecurity.smartcheck.SmartCheckAction;
 
@@ -29,10 +35,13 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.security.ACL;
 import hudson.tasks.ArtifactArchiver;
 import hudson.util.ArgumentListBuilder;
+import hudson.util.Secret;
 
 public class SmartCheckScanStep extends Step {
 	private static final Logger LOGGER = Logger.getLogger(SmartCheckScanStep.class.getName());
@@ -43,8 +52,13 @@ public class SmartCheckScanStep extends Step {
 
 	private String smartcheckHost;
 	private boolean insecureSkipTLSVerify = false;
+
+	@Deprecated
 	private String smartcheckUser;
+	@Deprecated
 	private String smartcheckPassword;
+	private String smartcheckCredentialsId;
+
 	private String imageName;
 	private String imagePullAuth;
 	private boolean insecureSkipRegistryTLSVerify = false;
@@ -58,9 +72,10 @@ public class SmartCheckScanStep extends Step {
 
 	private boolean debug = false;
 
+	@Deprecated
 	@DataBoundConstructor
 	public SmartCheckScanStep(
-		String imageName, String smartcheckHost, String smartcheckUser, String smartcheckPassword
+		String imageName, String smartcheckHost
 	) {
 		if (StringUtils.stripToNull(imageName) == null) {
 			throw new IllegalArgumentException("imageName cannot be empty");
@@ -68,18 +83,10 @@ public class SmartCheckScanStep extends Step {
 		if (StringUtils.stripToNull(smartcheckHost) == null) {
 			throw new IllegalArgumentException("smartcheckHost cannot be empty");
 		}
-		if (StringUtils.stripToNull(smartcheckUser) == null) {
-			throw new IllegalArgumentException("smartcheckUser cannot be empty");
-		}
-		if (StringUtils.stripToNull(smartcheckPassword) == null) {
-			throw new IllegalArgumentException("smartcheckPassword cannot be empty");
-		}
 		SmartCheckAction.validateSmartcheckUrl(smartcheckHost);
 
 		this.imageName = imageName;
 		this.smartcheckHost = smartcheckHost;
-		this.smartcheckUser = smartcheckUser;
-		this.smartcheckPassword = smartcheckPassword;
 	}
 
 	public String getSmartcheckHost() {
@@ -100,22 +107,35 @@ public class SmartCheckScanStep extends Step {
 		this.insecureSkipTLSVerify = insecureSkipTLSVerify;
 	}
 
+	@Deprecated
 	public String getSmartcheckUser() {
 		return smartcheckUser;
 	}
 
+	@Deprecated
 	@DataBoundSetter
 	public void setSmartcheckUser(String smartcheckUser) {
 		this.smartcheckUser = smartcheckUser;
 	}
 
+	@Deprecated
 	public String getSmartcheckPassword() {
 		return smartcheckPassword;
 	}
 
+	@Deprecated
 	@DataBoundSetter
 	public void setSmartcheckPassword(String smartcheckPassword) {
 		this.smartcheckPassword = smartcheckPassword;
+	}
+
+	public String getSmartcheckCredentialsId() {
+		return smartcheckCredentialsId;
+	}
+
+	@DataBoundSetter
+	public void setSmartcheckCredentialsId(String smartcheckCredentialsId) {
+		this.smartcheckCredentialsId = smartcheckCredentialsId;
 	}
 
 	public String getImageName() {
@@ -248,6 +268,86 @@ public class SmartCheckScanStep extends Step {
 			this.step = step;
 		}
 
+		// We want users to be able to provide the host as either just the hostname, hostname:port,
+		// or scheme:... but that means we need to do a little mangling of the input to make sure we
+		// can get a proper URI out the end, as "hostname:port" is sometimes indistinguishable from
+		// "scheme:...".
+		// If we don't get a host from attempting to parse the URI, we'll assume the scheme is "https".
+		private String getURIForHost(String host) {
+			try {
+				URI u = new URI(host);
+				if (u.getHost() != null) {
+					return host;
+				}
+			} catch (URISyntaxException e) {
+				// fall through
+			}
+
+			return "https://" + host;
+		}
+
+		private StandardUsernamePasswordCredentials getCredentials(String credentialsId, String host, Item owner) {
+			if (credentialsId == null) {
+				return null;
+			}
+
+			return CredentialsMatchers.firstOrNull(
+				CredentialsProvider.lookupCredentials(
+					StandardUsernamePasswordCredentials.class,
+					owner,
+					ACL.SYSTEM,
+					URIRequirementBuilder.fromUri(getURIForHost(host)).build()
+				),
+				CredentialsMatchers.withId(credentialsId)
+			);
+		}
+
+		private boolean addUsernamePasswordArgs(
+			ArgumentListBuilder dockerCommandArgs, String usernameVar, String passwordVar, String credentialsId,
+			String credentialsAttribute, String host, Run<?, ?> run, String defaultUsername, String defaultPassword,
+			boolean required) {
+
+			if (credentialsId != null) {
+				StandardUsernamePasswordCredentials smartcheckCredentials = this
+					.getCredentials(credentialsId, host, run.getParent());
+
+				if (smartcheckCredentials == null) {
+					getContext().onFailure(
+						new AbortException(
+							"Could not find credentials with id " + credentialsId
+						)
+					);
+					return false;
+				}
+
+				CredentialsProvider.track(run, smartcheckCredentials);
+
+				dockerCommandArgs.add("-e", usernameVar + "=" + smartcheckCredentials.getUsername());
+				dockerCommandArgs.add("-e", passwordVar + "=" + Secret.toString(smartcheckCredentials.getPassword()));
+
+				return true;
+			}
+
+			if (required && (defaultUsername == null || defaultPassword == null)) {
+				getContext().onFailure(
+					new AbortException(
+						"Credentials are required, use " + credentialsAttribute + " to provide them."
+					)
+				);
+				return false;
+			}
+
+			if (defaultUsername != null) {
+				dockerCommandArgs.add("-e", usernameVar + "=" + defaultUsername);
+			}
+
+			if (defaultPassword != null) {
+				dockerCommandArgs.add("-e", passwordVar + "=" + defaultPassword);
+			}
+
+			return true;
+		}
+
 		@Override
 		protected Void run() throws IOException, InterruptedException {
 			LOGGER.fine("Starting scan step");
@@ -273,11 +373,27 @@ public class SmartCheckScanStep extends Step {
 
 			dockerCommandArgs.add("-e", "DSSC_SMARTCHECK_HOST=" + step.getSmartcheckHost());
 			dockerCommandArgs.add("-e", "DSSC_IMAGE_NAME=" + step.getImageName());
-			dockerCommandArgs.add("-e", "DSSC_SMARTCHECK_USER=" + step.getSmartcheckUser());
-			dockerCommandArgs.add("-e", "DSSC_SMARTCHECK_PASSWORD=" + step.getSmartcheckPassword());
+
+			if (!addUsernamePasswordArgs(
+				dockerCommandArgs,
+				"DSSC_SMARTCHECK_USER",
+				"DSSC_SMARTCHECK_PASSWORD",
+				step.getSmartcheckCredentialsId(),
+				"smartcheckCredentialsId",
+				step.getSmartcheckHost(),
+				currentBuild,
+				step.getSmartcheckUser(),
+				step.getSmartcheckPassword(),
+				true
+			)) {
+				// error has already been reported
+				return null;
+			}
+
 			if (step.isInsecureSkipTLSVerify()) {
 				dockerCommandArgs.add("-e", "DSSC_INSECURE_SKIP_TLS_VERIFY=" + step.isInsecureSkipTLSVerify());
 			}
+
 			if (step.isInsecureSkipRegistryTLSVerify()) {
 				dockerCommandArgs
 					.add("-e", "DSSC_INSECURE_SKIP_REGISTRY_TLS_VERIFY=" + step.isInsecureSkipRegistryTLSVerify());
