@@ -67,8 +67,12 @@ public class SmartCheckScanStep extends Step {
 
 	private boolean preregistryScan = false;
 	private String preregistryHost;
+
+	@Deprecated
 	private String preregistryUser;
+	@Deprecated
 	private String preregistryPassword;
+	private String preregistryCredentialsId;
 
 	private boolean debug = false;
 
@@ -210,22 +214,35 @@ public class SmartCheckScanStep extends Step {
 		this.preregistryHost = preregistryHost;
 	}
 
+	@Deprecated
 	public String getPreregistryUser() {
 		return preregistryUser;
 	}
 
+	@Deprecated
 	@DataBoundSetter
 	public void setPreregistryUser(String preregistryUser) {
 		this.preregistryUser = preregistryUser;
 	}
 
+	@Deprecated
 	public String getPreregistryPassword() {
 		return preregistryPassword;
 	}
 
+	@Deprecated
 	@DataBoundSetter
 	public void setPreregistryPassword(String preregistryPassword) {
 		this.preregistryPassword = preregistryPassword;
+	}
+
+	public String getPreregistryCredentialsId() {
+		return preregistryCredentialsId;
+	}
+
+	@DataBoundSetter
+	public void setPreregistryCredentialsId(String preregistryCredentialsId) {
+		this.preregistryCredentialsId = preregistryCredentialsId;
 	}
 
 	@Override
@@ -286,6 +303,24 @@ public class SmartCheckScanStep extends Step {
 			return "https://" + host;
 		}
 
+		private String derivePreregistryHost(String smartcheckHost) {
+			try {
+				URI u = new URI(getURIForHost(smartcheckHost));
+				return new URI(
+					u.getScheme(),
+					u.getUserInfo(),
+					u.getHost(),
+					5000, // registry is running on smartcheck:5000
+					u.getPath(),
+					u.getQuery(),
+					u.getFragment()
+				).toString();
+			} catch (URISyntaxException e) {
+				// this is unexpected ... return the unmodified host value
+				return smartcheckHost;
+			}
+		}
+
 		private StandardUsernamePasswordCredentials getCredentials(String credentialsId, String host, Item owner) {
 			if (credentialsId == null) {
 				return null;
@@ -314,7 +349,7 @@ public class SmartCheckScanStep extends Step {
 				if (smartcheckCredentials == null) {
 					getContext().onFailure(
 						new AbortException(
-							"Could not find credentials with id " + credentialsId
+							"Could not find credentials with id " + credentialsId + " for host " + host.replace("https://", "")
 						)
 					);
 					return false;
@@ -409,14 +444,26 @@ public class SmartCheckScanStep extends Step {
 				dockerCommandArgs.add("-v", "/var/run/docker.sock:/var/run/docker.sock");
 				dockerCommandArgs.add("-e", "DSSC_PREREGISTRY_SCAN=true");
 			}
-			if (StringUtils.stripToNull(step.getPreregistryHost()) != null) {
-				dockerCommandArgs.add("-e", "DSSC_PREREGISTRY_HOST=" + step.getPreregistryHost());
+
+			String preregistryHost = StringUtils.stripToNull(step.getPreregistryHost());
+			if (preregistryHost != null) {
+				dockerCommandArgs.add("-e", "DSSC_PREREGISTRY_HOST=" + preregistryHost);
 			}
-			if (StringUtils.stripToNull(step.getPreregistryUser()) != null) {
-				dockerCommandArgs.add("-e", "DSSC_PREREGISTRY_USER=" + step.getPreregistryUser());
-			}
-			if (StringUtils.stripToNull(step.getPreregistryPassword()) != null) {
-				dockerCommandArgs.add("-e", "DSSC_PREREGISTRY_PASSWORD=" + step.getPreregistryPassword());
+
+			if (!addUsernamePasswordArgs(
+				dockerCommandArgs,
+				"DSSC_PREREGISTRY_USER",
+				"DSSC_PREREGISTRY_PASSWORD",
+				step.getPreregistryCredentialsId(),
+				"preregistryCredentialsId",
+				preregistryHost != null ? preregistryHost : derivePreregistryHost(step.getSmartcheckHost()),
+				currentBuild,
+				step.getPreregistryUser(),
+				step.getPreregistryPassword(),
+				false
+			)) {
+				// error has already been reported
+				return null;
 			}
 
 			dockerCommandArgs.add(DSSC_SCAN_IMAGE);

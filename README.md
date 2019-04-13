@@ -84,10 +84,9 @@ withCredentials([
 - **preregistryHost**
   - The hostname of the temporary registry. Defaults to the `smartcheckHost` on
     port 5000.
-- **preregistryUser**
-  - The username to authenticate with the temporary registry.
-- **preregistryPassword**
-  - The password to authenticate with the temporary registry.
+- **preregistryCredentialsId**
+  - The credentials to authenticate with the temporary registry. This must be a
+    "Username with password" credential.
 - **resultsFile** - default: `scan-results.json`
   - The path to write the scan results to
 - **findingsThreshold**
@@ -160,27 +159,17 @@ withCredentials([
 
 Deep Security Smart Check can scan your images before they are pushed to your
 production registry. If you have enabled pre-registry scanning on your Deep
-Security Smart Check instance, you can add the `preregistryScan`,
-`preregistryUser`, and `preregistryPassword` parameters to the `smartcheckScan`
-method:
+Security Smart Check instance, you can add the `preregistryScan` and 
+`preregistryCredentialsId` parameters to the `smartcheckScan` method:
 
 ```groovy
-withCredentials([
-    usernamePassword([
-        credentialsId: "preregistry-auth",
-        usernameVariable: "PREREGISTRY_USER",
-        passwordVariable: "PREREGISTRY_PASSWORD",
-    ])
-]){
-    smartcheckScan([
-        imageName: "registry.example.com/my-project/my-image",
-        smartcheckHost: "smartcheck.example.com",
-        smartcheckCredentialsId: "smartcheck-auth",
-        preregistryScan: true,
-        preregistryUser: PREREGISTRY_USER,
-        preregistryPassword: PREREGISTRY_PASSWORD,
-    ])
-}
+smartcheckScan([
+    imageName: "registry.example.com/my-project/my-image",
+    smartcheckHost: "smartcheck.example.com",
+    smartcheckCredentialsId: "smartcheck-auth",
+    preregistryScan: true,
+    preregistryCredentialsId: "preregistry-auth",
+])
 ```
 
 ## Development
