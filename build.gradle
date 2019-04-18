@@ -23,6 +23,7 @@ jenkinsPlugin {
 	// human-readable name of plugin
 	displayName = "Deep Security Smart Check Plugin"
 	url = "https://www.trendmicro.com/smartcheck"
+	gitHubUrl = "https://github.com/jenkinsci/deepsecurity-smartcheck-plugin"
 
 	licenses {
 		license {
