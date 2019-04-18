@@ -48,8 +48,8 @@ withCredentials([
     Security Smart Check. You may want to set this if you've configured a self
     signed cert.
 - **smartcheckCredentialsId**
-  - The credentials to authenticate with the Deep Security Smart Check deployment.
-    This must be a "Username with password" credential.
+  - The credentials to authenticate with the Deep Security Smart Check
+    deployment. This must be a "Username with password" credential.
 - **imageName**
   - The name of the image to scan
 - **imagePullAuth**
@@ -159,7 +159,7 @@ withCredentials([
 
 Deep Security Smart Check can scan your images before they are pushed to your
 production registry. If you have enabled pre-registry scanning on your Deep
-Security Smart Check instance, you can add the `preregistryScan` and 
+Security Smart Check instance, you can add the `preregistryScan` and
 `preregistryCredentialsId` parameters to the `smartcheckScan` method:
 
 ```groovy
