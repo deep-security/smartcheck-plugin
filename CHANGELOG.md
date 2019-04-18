@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fix documentation link
+
 ## 1.1.0 release notes
 
 - Add support for passing credentials via the
