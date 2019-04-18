@@ -6,13 +6,9 @@ Provides Jenkins integration with [Deep Security Smart Check][]
 
 ## Installation
 
-1. Download the `hpi` file from the
-   [releases page](https://github.com/deep-security/smartcheck-plugin/releases)
-2. Install this plugin on your Jenkins server:
-   1. From the Jenkins homepage navigate to "Manage Jenkins"
-   2. Navigate to "Manage Plugins"
-   3. Change the tab to "Advanced"
-   4. Under the "Upload Plugin" select the `hpi` file we downloaded earlier.
+1. In Jenkins, go to Manage Jenkins > Manage Plugins
+2. Select the "Available" tab
+3. Search for "Deep Security Smart Check"
 
 ## Usage
 
@@ -180,7 +176,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for instructions on getting started.
 
 If you encounter a bug, think of a useful feature, or find something confusing
 in the docs, please
-[create a new issue](https://github.com/deep-security/smartcheck-plugin/issues/new)!
+[create a new issue](https://github.com/jenkinsci/deepsecurity-smartcheck-plugin/issues/new)!
 
 We :heart: pull requests. If you'd like to fix a bug, contribute to a feature or
 just correct a typo, please feel free to do so.
