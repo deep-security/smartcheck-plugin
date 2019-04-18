@@ -22,7 +22,7 @@ jenkinsPlugin {
 	shortName = "deepsecurity-smartcheck"
 	// human-readable name of plugin
 	displayName = "Deep Security Smart Check Plugin"
-	url = "https://www.trendmicro.com/smartcheck"
+	url = "https://github.com/jenkinsci/deepsecurity-smartcheck-plugin"
 	gitHubUrl = "https://github.com/jenkinsci/deepsecurity-smartcheck-plugin"
 
 	licenses {
