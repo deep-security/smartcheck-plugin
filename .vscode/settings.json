@@ -3,7 +3,9 @@
     "**/.classpath": true,
     "**/.project": true,
     "**/.settings": true,
-    "**/.factorypath": true
+    "**/.factorypath": true,
+    "build": true,
+    ".gradle": true
   },
   "files.associations": {
     "*.jelly": "xml"
