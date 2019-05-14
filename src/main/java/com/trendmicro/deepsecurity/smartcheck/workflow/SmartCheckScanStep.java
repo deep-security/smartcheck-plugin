@@ -383,6 +383,38 @@ public class SmartCheckScanStep extends Step {
 			return true;
 		}
 
+		private void pullScanImage(PrintStream logger, Launcher launcher) throws IOException, InterruptedException {
+			ArgumentListBuilder dockerPullCommandArgs = new ArgumentListBuilder();
+			dockerPullCommandArgs.add("docker", "pull", DSSC_SCAN_IMAGE);
+
+			if (step.isDebug()) {
+				logger.println("command = " + dockerPullCommandArgs.toString());
+			}
+
+			logger.println("Pulling Deep Security Smart Check scan image...");
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			int status = launcher
+				.launch()
+				.cmds(dockerPullCommandArgs)
+				.stderr(logger)
+				.stdout(baos)
+				.quiet(!step.isDebug())
+				.join();
+			String output = new String(baos.toByteArray(), "UTF-8");
+
+			if (step.isDebug()) {
+				logger.println("Status code was: " + status);
+			}
+
+			if (status != EXIT_OK) {
+				String errorMessage = "Could not retrieve Deep Security Smart Check scan image.";
+				logger.println(errorMessage);
+				logger.println(output);
+				throw new AbortException(errorMessage);
+			}
+		}
+
 		@Override
 		protected Void run() throws IOException, InterruptedException {
 			LOGGER.fine("Starting scan step");
@@ -400,6 +432,9 @@ public class SmartCheckScanStep extends Step {
 					);
 				return null;
 			}
+
+			pullScanImage(logger, launcher);
+
 			String workspacePath = workspaceFilePath.getRemote();
 
 			ArgumentListBuilder dockerCommandArgs = new ArgumentListBuilder();
