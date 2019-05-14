@@ -11,7 +11,7 @@ eclipse {
 }
 
 group = "io.jenkins.plugins"
-version = "1.1.1"
+version = "1.1.2"
 description = "Scan container images with Deep Security Smart Check."
 
 // see https://github.com/jenkinsci/gradle-jpi-plugin
