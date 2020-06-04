@@ -1,6 +1,8 @@
 # Deep Security Smart Check plugin for Jenkins
 
-Provides Jenkins integration with [Deep Security Smart Check][]
+Provides Jenkins integration with [Deep Security Smart Check][].
+
+:warning: This repository is **archived**, visit https://github.com/jenkinsci/deepsecurity-smartcheck-plugin for latest release.
 
 [deep security smart check]: https://www.trendmicro.com/smartcheck
 
